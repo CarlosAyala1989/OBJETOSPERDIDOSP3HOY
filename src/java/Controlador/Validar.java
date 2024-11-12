@@ -4,6 +4,8 @@
  */
 package Controlador;
 
+import Modelo.Login;
+import Modelo.LoginDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -18,6 +20,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "Validar", urlPatterns = {"/Validar"})
 public class Validar extends HttpServlet {
+
+    Login log = new Login();
+    LoginDAO logDAO = new LoginDAO();
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -71,7 +76,20 @@ public class Validar extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String accion = request.getParameter("accion");
+        if (accion.equalsIgnoreCase("Ingresar")) {
+            String user = request.getParameter("username");
+            String pass = request.getParameter("password");
+            log = logDAO.Valida(user, pass);
+            if (log.getUsuario()!= null) {
+                request.setAttribute("usuario", log);
+                request.getRequestDispatcher("Controlador?accion=MenuPrincipal").forward(request, response);
+            } else {
+                request.getRequestDispatcher("index.jsp").forward(request, response);
+            }
+        } else {
+            request.getRequestDispatcher("index.jsp").forward(request, response);
+        }
     }
 
     /**
